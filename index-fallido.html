@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibrasAprende - Alfabeto Dactilológico</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --background: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --text-muted: #4b5563;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #eeeffe;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .progress-bar-bg {
+            width: 100px;
+            height: 8px;
+            background: #c7d2fe;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem auto;
+            max-width: 1000px;
+            padding: 0 1rem;
+        }
+
+        .tab-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            flex: 1;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .view-panel {
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        /* DICCIONARIO VIEW */
+        .dictionary-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .dictionary-layout {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .abc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 0.5rem;
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .letter-card {
+            background: var(--background);
+            border: 2px solid transparent;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.25rem;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .letter-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .letter-card.selected {
+            background: #eeeffe;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .letter-card.learned::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 5px;
+            font-size: 0.75rem;
+            color: var(--success);
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: sticky;
+            top: 90px;
+        }
+
+        .hand-container {
+            width: 200px;
+            height: 200px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed var(--border);
+        }
+
+        .hand-svg {
+            width: 140px;
+            height: 140px;
+            fill: none;
+            stroke: #374151;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .action-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .action-btn.learned-btn {
+            background: white;
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .action-btn.learned-btn:hover {
+            background: #ecfdf5;
+        }
+
+        /* PRÁCTICA VIEW */
+        .quiz-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 2rem auto;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #f9fafb;
+        }
+
+        .option-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success);
+            color: #065f46;
+        }
+
+        .option-btn.wrong {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .feedback-message {
+            margin-top: 1rem;
+            font-weight: 600;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1>👋 LibrasAprende</h1>
+            <div class="progress-container">
+                <span>Progresso: <span id="progress-text">0%</span></span>
+                <div class="progress-bar-bg">
+                    <div id="progress-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-tabs">
+        <div class="tab-btn active" onclick="switchView('study')">Estudar Abecedário</div>
+        <div class="tab-btn" onclick="switchView('practice')">Praticar</div>
+    </div>
+
+    <main>
+        <!-- VISTA DE ESTUDIO -->
+        <div id="view-study" class="view-panel active">
+            <div class="dictionary-layout">
+                <div class="abc-grid" id="abc-grid">
+                    <!-- Tarjetas de letras generadas dinámicamente -->
+                </div>
+                <div class="detail-card">
+                    <h2 style="font-size: 3rem; color: var(--primary)" id="detail-letter">A</h2>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Configuração da mão em Libras</p>
+                    <div class="hand-container">
+                        <svg class="hand-svg" viewBox="0 0 100 100" id="hand-svg-display">
+                            <!-- El diseño SVG adaptivo de la mano se inyectará aquí -->
+                        </svg>
+                    </div>
+                    <button class="action-btn" id="toggle-learned-btn" onclick="toggleLetterLearned()">Marcar como aprendida</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA DE PRÁCTICA -->
+        <div id="view-practice" class="view-panel">
+            <div class="quiz-container">
+                <h3>Qual é esta letra em Libras?</h3>
+                <div class="hand-container" style="margin: 1.5rem auto;">
+                    <svg class="hand-svg" viewBox="0 0 100 100" id="quiz-svg-display">
+                        <!-- SVG del juego -->
+                    </svg>
+                </div>
+// Base de Datos Estructural y Gráfica del Alfabeto Dactilológico de Libras
+// Cada letra posee una representación geométrica vectorial limpia simulando el contorno de los dedos
+const librasAlphabet = {
+'A': <g><rect x="35" y="45" width="30" height="40" rx="10"/><circle cx="45" cy="55" r="5"/><path d="M 65 50 Q 80 55 75 70"/></g>,
+'B': <g><rect x="35" y="35" width="30" height="50" rx="5"/><line x1="42" y1="35" x2="42" y2="85"/><line x1="50" y1="35" x2="50" y2="85"/><line x1="58" y1="35" x2="58" y2="85"/><path d="M 35 65 Q 25 70 35 75"/></g>,
+'C': <g><path d="M 65 30 C 25 30 25 80 65 80" stroke-width="6"/></g>,
+'D': <g><rect x="42" y="50" width="25" height="35" rx="5"/><line x1="42" y1="20" x2="42" y2="85"/><path d="M 42 60 Q 30 65 42 75"/></g>,
+'E': <g><rect x="35" y="45" width="30" height="40" rx="5"/><line x1="35" y1="55" x2="65" y2="55"/><line x1="35" y1="65" x2="65" y2="65"/><line x1="35" y1="75" x2="65" y2="75"/></g>,
+'F': <g><rect x="45" y="35" width="25" height="50" rx="5"/><path d="M 45 35 Q 25 40 35 55"/><line x1="35" y1="55" x2="55" y2="55"/></g>,
+'G': <g><rect x="35" y="50" width="30" height="35" rx="8"/><line x1="45" y1="25" x2="45" y2="60"/><path d="M 45 35 Q 65 30 55 50"/></g>,
+'H': <g><rect x="35" y="45" width="30" height="40" rx="5"/><line x1="42" y1="25" x2="42" y2="85"/><line x1="52" y1="25" x2="52" y2="85"/><path d="M 52 45 Q 70 55 52 65"/></g>,
+'I': <g><rect x="35" y="50" width="25" height="35" rx="8"/><line x1="60" y1="30" x2="60" y2="85"/><path d="M 35 65 Q 25 70 35 75"/></g>,
+'J': <g><path d="M 60 30 L 60 75 C 60 90 35 90 35 75" stroke-width="5"/><rect x="30" y="50" width="25" height="30" rx="5"/></g>,
+'K': <g><rect x="35" y="45" width="30" height="40" rx="5"/><line x1="42" y1="20" x2="42" y2="85"/><line x1="52" y1="25" x2="52" y2="85"/><path d="M 52 40 Q 75 35 52 55"/></g>,
+'L': <g><rect x="45" y="45" width="25" height="40" rx="5"/><line x1="45" y1="20" x2="45" y2="85"/><path d="M 45 65 L 20 65" stroke-width="5"/></g>,
+'M': <g><rect x="35" y="50" width="35" height="35" rx="5"/><line x1="42" y1="50" x2="42" y2="85"/><line x1="52" y1="50" x2="52" y2="85"/><line x1="62" y1="50" x2="62" y2="85"/></g>,
+'N': <g><rect x="35" y="50" width="26" height="35" rx="5"/><line x1="42" y1="50" x2="42" y2="85"/><line x1="52" y1="50" x2="52" y2="85"/></g>,
+'O': <g><circle cx="50" cy="55" r="22" stroke-width="5"/></g>,
+'P': <g><rect x="35" y="55" width="30" height="30" rx="5"/><line x1="40" y1="35" x2="40" y2="85"/><line x1="50" y1="40" x2="50" y2="85"/><path d="M 50 55 Q 70 60 50 70"/></g>,
+'Q': <g><rect x="35" y="35" width="30" height="35" rx="8"/><line x1="45" y1="50" x2="45" y2="85"/><path d="M 45 55 Q 65 70 55 85"/></g>,
+'R': <g><rect x="35" y="45" width="30" height="40" rx="5"/><path d="M 42 25 L 54 85 M 52 25 L 40 85" stroke-width="5"/></g>,
+'S': <g><rect x="35" y="45" width="30" height="40" rx="10"/><path d="M 30 65 Q 50 50 65 65" stroke-width="5"/></g>,
+'T': <g><rect x="45" y="35" width="25" height="50" rx="5"/><path d="M 45 35 Q 25 40 35 55"/><line x1="40" y1="45" x2="40" y2="75"/></g>,
+'U': <g><rect x="35" y="50" width="30" height="35" rx="5"/><line x1="42" y1="25" x2="42" y2="85"/><line x1="54" y1="25" x2="54" y2="85"/></g>,
+'V': <g><rect x="35" y="50" width="30" height="35" rx="5"/><line x1="40" y1="25" x2="40" y2="85"/><line x1="58" y1="25" x2="58" y2="85"/></g>,
+'W': <g><rect x="35" y="50" width="32" height="35" rx="5"/><line x1="40" y1="25" x2="40" y2="85"/><line x1="50" y1="23" x2="50" y2="85"/><line x1="60" y1="25" x2="60" y2="85"/></g>,
+'X': <g><rect x="35" y="45" width="30" height="40" rx="5"/><path d="M 45 45 Q 45 20 30 30" stroke-width="5"/></g>,
+'Y': <g><rect x="40" y="50" width="20" height="35" rx="5"/><path d="M 20 30 Q 30 55 45 55 Q 60 55 75 30" stroke-width="5"/></g>,
+'Z': <g><path d="M 35 35 L 65 35 L 35 75 L 65 75" stroke-width="5" stroke-linecap="round"/></g>
+};
+let learnedLetters = JSON.parse(localStorage.getItem('libras_learned')) || [];
+let currentSelectedLetter = 'A';
+let currentQuizLetter = '';
+// Inicialización de la Interfaz
+function init() {
+renderAbcGrid();
+selectLetter('A');
+updateProgressBar();
+generateQuizQuestion();
+}
+// Cambiar entre Pestañas
+function switchView(view) {
+document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+if(view === 'study') {
+document.querySelectorAll('.tab-btn')[0].classList.add('active');
+document.getElementById('view-study').classList.add('active');
+} else {
+document.querySelectorAll('.tab-btn')[1].classList.add('active');
+document.getElementById('view-practice').classList.add('active');
+generateQuizQuestion();
+}
+}
+// Renderizar Cuadrícula de Abecedario
+function renderAbcGrid() {
+const grid = document.getElementById('abc-grid');
+grid.innerHTML = '';
+Object.keys(librasAlphabet).forEach(letter => {
+const card = document.createElement('div');
+card.className = letter-card ${learnedLetters.includes(letter) ? 'learned' : ''} ${letter === currentSelectedLetter ? 'selected' : ''};
+card.id = card-${letter};
+card.innerText = letter;
+card.onclick = () => selectLetter(letter);
+grid.appendChild(card);
+});
+}
+// Seleccionar una Letra para ver detalle
+function selectLetter(letter) {
+currentSelectedLetter = letter;
+document.querySelectorAll('.letter-card').forEach(c => c.classList.remove('selected'));
+const selectedPar = document.getElementById(card-${letter});
+if(selectedPar) selectedPar.classList.add('selected');
+document.getElementById('detail-letter').innerText = letter;
+document.getElementById('hand-svg-display').innerHTML = librasAlphabet[letter];
+const btn = document.getElementById('toggle-learned-btn');
+if(learnedLetters.includes(letter)) {
+btn.innerText = '✓ Aprendida (Remover)';
+btn.className = 'action-btn learned-btn';
+} else {
+btn.innerText = 'Marcar como aprendida';
+btn.className = 'action-btn';
+}
+}
+// Guardar/Eliminar Progreso de la Letra
+function toggleLetterLearned() {
+if(learnedLetters.includes(currentSelectedLetter)) {
+learnedLetters = learnedLetters.filter(l => l !== currentSelectedLetter);
+} else {
+learnedLetters.push(currentSelectedLetter);
+}
+localStorage.setItem('libras_learned', JSON.stringify(learnedLetters));
+renderAbcGrid();
+selectLetter(currentSelectedLetter);
+updateProgressBar();
+}
+// Actualizar barra de progreso superior
+function updateProgressBar() {
+const total = Object.keys(librasAlphabet).length;
+const percentage = Math.round((learnedLetters.length / total) * 100);
+document.getElementById('progress-text').innerText = ${percentage}%;
+document.getElementById('progress-fill').style.width = ${percentage}%;
+}
+// MOTOR DEL MODO PRÁCTICA (JUEGO)
+function generateQuizQuestion() {
+const letters = Object.keys(librasAlphabet);
+// Elegir una letra aleatoria para preguntar
+currentQuizLetter = letters[Math.floor(Math.random() * letters.length)];
+// Inyectar el SVG de la mano misteriosa
+document.getElementById('quiz-svg-display').innerHTML = librasAlphabet[currentQuizLetter];
+document.getElementById('quiz-feedback').innerText = '';
+document.getElementById('next-quiz-btn').style.display = 'none';
+// Generar 4 opciones (1 correcta, 3 incorrectas)
+let options = [currentQuizLetter];
+while(options.length < 4) {
+let randomLet = letters[Math.floor(Math.random() * letters.length)];
+if(!options.includes(randomLet)) {
+options.push(randomLet);
+}
+}
+// Mezclar opciones aleatoriamente
+options.sort(() => Math.random() - 0.5);
+// Renderizar botones de opción
+const optionsContainer = document.getElementById('quiz-options-container');
+optionsContainer.innerHTML = '';
+options.forEach(opt => {
+const btn = document.createElement('button');
+btn.className = 'option-btn';
+btn.innerText = opt;
+btn.onclick = () => checkQuizAnswer(btn, opt);
+optionsContainer.appendChild(btn);
+});
+}
+function checkQuizAnswer(selectedBtn, selectedOption) {
+// Deshabilitar todas las opciones tras responder
+document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+const feedback = document.getElementById('quiz-feedback');
+if(selectedOption === currentQuizLetter) {
+selectedBtn.classList.add('correct');
+feedback.innerText = '🎉 Excelente! Resposta correta.';
+feedback.style.color = 'var(--success)';
+// Si acertó y no la tenía marcada como aprendida, incentivar el progreso
+if(!learnedLetters.includes(currentQuizLetter)) {
+learnedLetters.push(currentQuizLetter);
+localStorage.setItem('libras_learned', JSON.stringify(learnedLetters));
+updateProgressBar();
+renderAbcGrid();
+}
+} else {
+selectedBtn.classList.add('wrong');
+feedback.innerText = ❌ Incorreto. Era a letra ${currentQuizLetter}.;
+feedback.style.color = '#ef4444';
+// Resaltar cuál era la correcta
+document.querySelectorAll('.option-btn').forEach(b => {
+if(b.innerText === currentQuizLetter) b.classList.add('correct');
+});
+}
+document.getElementById('next-quiz-btn').style.display = 'block';
+}
+// Inicializar al cargar la página
+window.onload = init;

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibrasAprende - Alfabeto Dactilológico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1>👋 LibrasAprende</h1>
+            <div class="progress-container">
+                <span>Progresso: <span id="progress-text">0%</span></span>
+                <div class="progress-bar-bg">
+                    <div id="progress-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-tabs">
+        <button id="tab-study" class="tab-btn active" onclick="switchView('study')">Estudar Abecedário</button>
+        <button id="tab-practice" class="tab-btn" onclick="switchView('practice')">Praticar</button>
+    </div>
+
+    <main>
+        <!-- VISTA DE ESTUDIO -->
+        <div id="view-study" class="view-panel active">
+            <div class="dictionary-layout">
+                <div class="abc-grid" id="abc-grid">
+                    <!-- Generado dinámicamente -->
+                </div>
+                <div class="detail-card">
+                    <h2 style="font-size: 3rem; color: var(--primary)" id="detail-letter">A</h2>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Configuração da mão em Libras</p>
+                    <div class="hand-container">
+                        <svg class="hand-svg" viewBox="0 0 100 100" id="hand-svg-display">
+                            <!-- SVG inyectado -->
+                        </svg>
+                    </div>
+                    <button class="action-btn" id="toggle-learned-btn" onclick="toggleLetterLearned()">Marcar como aprendida</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA DE PRÁCTICA -->
+        <div id="view-practice" class="view-panel">
+            <div class="quiz-container">
+                <h3>Qual é esta letra em Libras?</h3>
+                <div class="hand-container" style="margin: 1.5rem auto;">
+                    <svg class="hand-svg" viewBox="0 0 100 100" id="quiz-svg-display">
+                        <!-- SVG inyectado -->
+                    </svg>
+                </div>
+                <div class="feedback-message" id="quiz-feedback"></div>
+                <div class="quiz-options" id="quiz-options-container">
+                    <!-- Opciones generadas -->
+                </div>
+                <button class="action-btn" style="display:none; margin-top: 1.5rem;" id="next-quiz-btn" onclick="generateQuizQuestion()">Próxima Letra</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
